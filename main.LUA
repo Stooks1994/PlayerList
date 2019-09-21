@@ -95,15 +95,41 @@ function CheckPlayerList(player_name)
 	end
 end
 		
-
-local frame = CreateFrame("FRAME", "PlayerListFrame");
+--[[local frame = CreateFrame("FRAME", "PlayerListFrame");
 frame:RegisterEvent("GROUP_ROSTER_UPDATE");
 local function eventHandler(self, event, ...)
 	group_members = CreateListOfPlayers();
-	for k, v in pairs(group_members) do
+	for k, v in pairs(group_members) do		
 		CheckPlayerList(v);
 	end
 end
-frame:SetScript("OnEvent", eventHandler);
+frame:SetScript("OnEvent", eventHandler);]]
+
+local current_group = {};
+local frame, events = CreateFrame("Frame"), {};
+
+function events:GROUP_ROSTER_UPDATE(...)
+	group_members = CreateListOfPlayers();
+	for k, v in pairs(group_members) do
+		if current_group[v] ~= nil then
+			CheckPlayerList(v);
+			current_group[v] = "";
+		end
+	end
+end
+
+function events:GROUP_LEFT(...)
+	current_group = {};
+end
+
+frame:SetScript("OnEvent", function(self, event, ...)
+	events[event](self, ...);
+end);
+
+for k, v in pairs(events) do
+	frame:RegisterEvent(k);
+end
+
+
 
 
