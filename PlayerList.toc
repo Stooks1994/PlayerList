@@ -1,0 +1,8 @@
+## Interface: 11302
+## Title: PlayerList
+## Author: Ian Anderson
+## Version: 0.1
+## SavedVariables: Players
+
+main.lua
+main.xml
