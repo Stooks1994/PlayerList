@@ -18,7 +18,7 @@ function SlashCmdList.CHECK_TABLE(msg)
 	local player_name = string.match(msg, '(%a+)');
 	if player_name ~= nil then
 		if Players[player_name] ~= nil then
-			print(player_name .. " " .. Players[player_name]);
+			print(player_name .. " - " .. Players[player_name]);
 		else 
 			print(player_name .. " was not found");
 		end
@@ -51,24 +51,14 @@ end
 SLASH_PRINT_TABLE1 = "/plprint"
 function SlashCmdList.PRINT_TABLE()
 	for k, v in pairs(Players) do
-		print(k, v);
+		print(k .. " - " .. v);
 	end
 end
 	
 SLASH_HELP1 = "/pl"
 SLASH_HELP2 = "/plhelp"
 function SlashCmdList.HELP()
-	print("Use one of the commands: /pladd, /plcheck, /plvalue, /plprint, /plclear")
-end
-
-addon_loaded = IsAddOnLoaded("PlayerList");
-
-if addon_loaded ~= nil then
-	if Players == nil then
-		Players = {};
-	end
-else
-	print("failed load");
+	print("Use one of the commands: /pladd, /plcheck, /plremove, /plprint, /plclear")
 end
 
 function CreateListOfPlayers()
@@ -94,41 +84,39 @@ function CheckPlayerList(player_name)
 		print(player_name .. " " .. Players[player_name])
 	end
 end
-		
---[[local frame = CreateFrame("FRAME", "PlayerListFrame");
-frame:RegisterEvent("GROUP_ROSTER_UPDATE");
-local function eventHandler(self, event, ...)
-	group_members = CreateListOfPlayers();
-	for k, v in pairs(group_members) do		
-		CheckPlayerList(v);
+
+
+addon_loaded = IsAddOnLoaded("PlayerList");
+
+if addon_loaded ~= nil then
+	if Players == nil then
+		Players = {};
 	end
+else
+	print("failed load");
 end
-frame:SetScript("OnEvent", eventHandler);]]
 
-local current_group = {};
-local frame, events = CreateFrame("Frame"), {};
-
-function events:GROUP_ROSTER_UPDATE(...)
-	group_members = CreateListOfPlayers();
-	for k, v in pairs(group_members) do
-		if current_group[v] ~= nil then
-			CheckPlayerList(v);
-			current_group[v] = "";
+current_group = {};
+local frame = CreateFrame("FRAME", "PlayerListFrame");
+frame:RegisterEvent("GROUP_ROSTER_UPDATE");
+frame:RegisterEvent("GROUP_LEFT");
+local function eventHandler(self, event, ...)
+	if event == "GROUP_ROSTER_UPDATE" then
+		group_members = CreateListOfPlayers();
+		for k, v in pairs(group_members) do
+			if current_group[v] == nil then
+				CheckPlayerList(v);
+				current_group[v] = "temp";
+			end
 		end
 	end
+	
+	if event == "GROUP_LEFT" then
+		current_group = {};
+	end
 end
-
-function events:GROUP_LEFT(...)
-	current_group = {};
-end
-
-frame:SetScript("OnEvent", function(self, event, ...)
-	events[event](self, ...);
-end);
-
-for k, v in pairs(events) do
-	frame:RegisterEvent(k);
-end
+frame:SetScript("OnEvent", eventHandler);	
+	
 
 
 
