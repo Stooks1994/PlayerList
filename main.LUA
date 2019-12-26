@@ -1,7 +1,15 @@
+function FormatString(str)
+	local first, second = string.match(str, '(%a)(%a+)');
+	first = string.upper(first);
+	second = string.lower(second);
+	return (first .. second);
+end
+
 SLASH_ADD_TO_TABLE1 = "/pladd"
 function SlashCmdList.ADD_TO_TABLE(msg)
 	local player_name, reason = string.match(msg, '(%a+)%s(.+)');
 	if player_name ~= nil and reason ~= nil then
+		player_name = FormatString(player_name);
 		if Players[player_name] ~= nil then
 			print(player_name .. " has already been added to the list");
 		else
@@ -17,6 +25,7 @@ SLASH_CHECK_TABLE1 = "/plcheck"
 function SlashCmdList.CHECK_TABLE(msg)
 	local player_name = string.match(msg, '(%a+)');
 	if player_name ~= nil then
+		player_name = FormatString(player_name);
 		if Players[player_name] ~= nil then
 			print(player_name .. " - " .. Players[player_name]);
 		else 
@@ -31,6 +40,7 @@ SLASH_REMOVE_FROM_TABLE1 = "/plremove"
 function SlashCmdList.REMOVE_FROM_TABLE(msg)
 	local player_name = string.match(msg, '(%a+)');
 	if player_name ~= nil then
+		player_name = FormatString(player_name);
 		if Players[player_name] ~= nil then
 			Players[player_name] = nil;
 			print("Remove successful");
@@ -84,7 +94,6 @@ function CheckPlayerList(player_name)
 		print(player_name .. " " .. Players[player_name])
 	end
 end
-
 
 addon_loaded = IsAddOnLoaded("PlayerList");
 
